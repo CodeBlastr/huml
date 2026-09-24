@@ -74,13 +74,16 @@ describe("transport", () => {
       "memory_write",
     ]);
     expect(list.json.result.resultType).toBeUndefined();
+    expect(list.json.result.ttlMs).toBeUndefined();
   });
 
   it("modern: server/discover and tools/list carry resultType", async () => {
     const d = await rpc("server/discover", {}, { modern: true });
     expect(d.json.result).toMatchObject({ resultType: "complete", supportedVersions: expect.arrayContaining(["2026-07-28"]) });
+    expect(d.json.result).toMatchObject({ ttlMs: expect.any(Number), cacheScope: "public" });
     const l = await rpc("tools/list", {}, { modern: true });
     expect(l.json.result.tools).toHaveLength(7);
+    expect(l.json.result).toMatchObject({ resultType: "complete", ttlMs: expect.any(Number), cacheScope: "public" });
   });
 
   it("modern: header mismatch → 400 -32020; bad version → 400 -32022; unknown method → 404", async () => {

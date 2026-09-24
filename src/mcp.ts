@@ -15,6 +15,9 @@ const SUPPORTED = [...MODERN, ...LEGACY];
 const META_VERSION = "io.modelcontextprotocol/protocolVersion";
 
 const SERVER_INFO = { name: "huml", version: "0.1.0" };
+// Caching hints required on server/discover and tools/list in 2026-07-28
+// (server/utilities/caching). The tool list is static and holds no user data.
+const CACHE_HINTS = { ttlMs: 60 * 60 * 1000, cacheScope: "public" };
 const INSTRUCTIONS =
   "huml is a shared markdown memory used by many AI sessions at once. Use memory_search or memory_list to find docs, " +
   "memory_read to get content plus its version, and pass that version as if_version on every write. If a write returns " +
@@ -73,6 +76,7 @@ export async function handleMcp(request: Request, env: Env): Promise<Response> {
   }
 
   const result = (data: Record<string, unknown>) => rpcResult(id, modern ? { resultType: "complete", ...data } : data);
+  const cacheable = (data: Record<string, unknown>) => result(modern ? { ...data, ...CACHE_HINTS } : data);
 
   switch (method) {
     case "initialize": {
@@ -85,7 +89,7 @@ export async function handleMcp(request: Request, env: Env): Promise<Response> {
       });
     }
     case "server/discover":
-      return result({
+      return cacheable({
         supportedVersions: SUPPORTED,
         capabilities: { tools: { listChanged: false } },
         _meta: { "io.modelcontextprotocol/serverInfo": SERVER_INFO },
@@ -94,7 +98,7 @@ export async function handleMcp(request: Request, env: Env): Promise<Response> {
     case "ping":
       return result({});
     case "tools/list":
-      return result({ tools: TOOLS });
+      return cacheable({ tools: TOOLS });
     case "tools/call": {
       const name = params.name;
       const args = params.arguments ?? {};
