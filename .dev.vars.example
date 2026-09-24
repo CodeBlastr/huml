@@ -1,0 +1,2 @@
+# Local `wrangler dev` runtime secrets. Copy to .dev.vars; never commit .dev.vars.
+AUTH_TOKEN=

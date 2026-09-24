@@ -1,0 +1,48 @@
+name = "huml"
+main = "src/index.ts"
+compatibility_date = "2026-08-20"
+# global_fetch_strictly_public: required by the OAuth provider for Client ID
+# Metadata Document fetches (SSRF protection).
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+workers_dev = false
+
+routes = [
+  { pattern = "huml.ai", custom_domain = true },
+]
+
+[vars]
+PUBLIC_URL = "https://huml.ai"
+# Origin header allowlist. Requests without an Origin header are allowed
+# (native clients don't send one); requests with any other Origin get 403.
+ALLOWED_ORIGINS = "https://huml.ai,https://claude.ai,https://chatgpt.com,https://chat.openai.com,http://localhost,http://127.0.0.1"
+
+# AUTH_TOKEN is a secret: `wrangler secret put AUTH_TOKEN` in production,
+# `.dev.vars` locally. Never put it here.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "huml"
+database_id = "63d574da-0d0a-4df6-bd4b-13675d180de5"
+migrations_dir = "migrations"
+
+# OAuth grants, clients, and tokens for Claude.ai / ChatGPT connectors.
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "066aea6293c5469c86fc757f82053c5c"
+
+# Daily cleanup: expired OAuth records and stale auth_failures rows.
+[triggers]
+crons = ["17 4 * * *"]
+
+[observability]
+enabled = true
+
+# --- Semantic search (future) ------------------------------------------------
+# Uncomment both to switch memory_search from FTS5 to Vectorize. See
+# src/retrieval/vector.ts. The MCP tool contract does not change.
+# [[vectorize]]
+# binding = "VECTORIZE"
+# index_name = "huml-docs"
+#
+# [ai]
+# binding = "AI"

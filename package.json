@@ -1,0 +1,31 @@
+{
+  "name": "huml",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --ip 127.0.0.1 --port 8787 --local-upstream 127.0.0.1:8787",
+    "deploy": "node --env-file=.env node_modules/wrangler/bin/wrangler.js deploy",
+    "migrate:local": "wrangler d1 migrations apply huml --local",
+    "migrate:remote": "node --env-file=.env node_modules/wrangler/bin/wrangler.js d1 migrations apply huml --remote",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.scripts.json",
+    "seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
+    "tokens": "tsx --env-file-if-exists=.env scripts/tokens.ts",
+    "smoke": "tsx --env-file-if-exists=.env scripts/smoke.ts"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^1.1.0",
+    "hono": "^4.13.9",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
+    "@cloudflare/workers-types": "^5.20260924.1",
+    "@types/node": "^26.6.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "~4.1.0",
+    "wrangler": "^4.138.0"
+  }
+}
