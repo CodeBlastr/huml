@@ -216,3 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# huml: credentials and local state (never commit)
+.env
+.dev.vars
+node_modules/
+.wrangler/
+*.log
