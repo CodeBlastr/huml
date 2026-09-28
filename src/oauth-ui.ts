@@ -6,9 +6,15 @@ import type { AuthProps, Env } from "./env";
 /** Non-API routes: landing page and the OAuth consent page for Claude.ai / ChatGPT connectors. */
 export const app = new Hono<{ Bindings: Env }>();
 
-app.get("/", (c) =>
-  c.text("huml.ai: MCP memory server. Endpoint: https://huml.ai/mcp\nSource: https://github.com/CodeBlastr/huml\n"),
-);
+app.get("/", (c) => {
+  const endpoint = escape(`${new URL(c.env.PUBLIC_URL).origin}/mcp`);
+  return c.html(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>huml</title>${STYLE}<main><div class="card">
+<h1>huml: MCP memory server</h1>
+<p>Endpoint: <code>${endpoint}</code></p>
+<p>Source: <a href="https://github.com/CodeBlastr/huml">github.com/CodeBlastr/huml</a></p>
+</div></main></html>`);
+});
 
 app.get("/authorize", async (c) => {
   const oauth = c.env.OAUTH_PROVIDER;
@@ -89,6 +95,7 @@ h1{font-size:1.25rem;margin:0 0 12px} p{margin:0 0 12px} .muted{color:var(--mute
 input[type=password]{width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:inherit}
 .row{display:flex;gap:8px;margin-top:16px} button{flex:1;padding:10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;cursor:pointer}
 button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+a{color:var(--accent)} code{overflow-wrap:anywhere}
 </style>`;
 
 function consentPage(client: ClientInfo, req: AuthRequest, handle: string): string {
