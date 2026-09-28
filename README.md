@@ -222,6 +222,10 @@ Search can move to Cloudflare Vectorize without changing the tool contract:
 
 `makeRetriever()` picks `VectorRetriever` automatically once both bindings exist.
 
+## How it was built
+
+huml was written with Claude Code from a single detailed prompt, plus a few short follow-ups. The full prompt is in [PROMPT.md](PROMPT.md), verbatim, so you can compare what was asked for with what was built.
+
 ## License
 
 MIT
