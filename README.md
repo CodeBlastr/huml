@@ -43,7 +43,7 @@ Built-in memory only works inside one product, and you can't choose what it keep
 SQLite FTS5 with Porter stemming, ranked by BM25, over each file's name, description and content. With a few hundred to a few thousand well-named files, that plus `memory_list` is plenty for an agent to find what it needs. If you want semantic search, the retriever is behind an interface, and a Cloudflare Vectorize backend is stubbed out (see [Layout](#layout)). The tools stay the same either way.
 
 **How do my agents know to use it?**
-The server sends MCP instructions telling clients how to search, read and write safely. Whether a client checks memory on its own depends on the client, so it helps to add a line to your system prompt, `CLAUDE.md`, or custom instructions, e.g. *"Check huml memory for context about people, projects and my preferences before answering, and save anything worth remembering."*
+The server sends MCP instructions telling clients how to search, read and write safely. Whether a client checks memory on its own depends on the client, so it helps to add a line to your system prompt, `CLAUDE.md`, or custom instructions, e.g. *"Check huml memory for context about people, projects and my preferences before answering, and save anything worth remembering."* For agents that support skills, the [agent skill](#agent-skill) covers this in more detail.
 
 ## Tools
 
@@ -154,6 +154,19 @@ Add this to `~/.cursor/mcp.json`, or to `.cursor/mcp.json` in a project:
 
 An OAuth connection is tied to the token that approved it. Revoking that token (or rotating `AUTH_TOKEN`, if that's what you used) disconnects the client.
 
+## Agent skill
+
+[`skills/huml/SKILL.md`](skills/huml/SKILL.md) is an agent skill in the open SKILL.md format. It tells an agent when to check memory, what is worth saving, how to write with `if_version` and handle conflicts, and what search can and can't do. It only works alongside a connected huml server; it doesn't replace the setup above.
+
+Claude Code: copy the folder into your personal skills (all projects) or one project's skills:
+
+```sh
+mkdir -p ~/.claude/skills && cp -r skills/huml ~/.claude/skills/      # all projects
+mkdir -p .claude/skills && cp -r skills/huml .claude/skills/          # one project
+```
+
+Other SKILL.md-compatible agents: copy the `skills/huml/` folder into the agent's skills directory, as described in its docs.
+
 ## Admin
 
 All admin commands run against your deployed database. Add `--local` to target the `wrangler dev` database instead.
@@ -214,6 +227,7 @@ src/oauth-ui.ts       /authorize consent page
 src/retrieval/        Retriever interface, LexicalRetriever (FTS5), VectorRetriever stub
 migrations/           D1 schema
 scripts/              seed, tokens (admin), smoke (acceptance test)
+skills/huml/          agent skill (SKILL.md) for clients that support skills
 ```
 
 Search can move to Cloudflare Vectorize without changing the tool contract:
