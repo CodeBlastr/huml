@@ -1,6 +1,17 @@
 ---
 name: huml
 description: Use huml shared memory when the user refers to past work, projects, people or preferences, or asks to set up huml or one shared memory for their AI tools.
+allowed-tools:
+  - mcp__huml__memory_list
+  - mcp__huml__memory_read
+  - mcp__huml__memory_search
+  - mcp__huml__memory_write
+  - mcp__huml__memory_append
+  - mcp__huml__memory_str_replace
+  - mcp__huml__memory_delete
+  - Bash
+  - Read
+  - Edit
 ---
 
 # huml shared memory
@@ -10,6 +21,8 @@ huml is one shared markdown memory used by every AI client the user connects (Cl
 This skill only works when a huml server is deployed and connected as an MCP connector. If the `memory_*` tools are not available, say so and continue without memory, or follow First-time setup below if the user wants to set it up. Do not pretend to have read or saved anything.
 
 ## Tools
+
+The `memory_*` tools below come from the user's own huml MCP server. In Claude Code they are named `mcp__huml__memory_list` and so on, and are declared in `allowed-tools`. `Bash`, `Read` and `Edit` are declared only for First-time setup, which runs commands and edits config files in the user's local huml checkout.
 
 | Tool | Arguments | Returns |
 |---|---|---|
@@ -102,6 +115,19 @@ Suggested layout. This is a convention, not enforced. If the user's memory alrea
 - `/preferences/<topic>.md` for how the user likes things done.
 
 Write a `description` that says when to read the file. Keep content as short bullet points, newest status near the top or in a dated list.
+
+## Network access
+
+The skill itself makes no network calls and sends no data anywhere. Network traffic happens only in these cases:
+
+- **Memory tools:** the `memory_*` tools talk to the huml server the user deployed on their own Cloudflare account (`https://<their-host>/mcp`). The MCP client makes these calls, not the skill.
+- **First-time setup only**, and only when the user asks for it:
+  - `github.com/CodeBlastr/huml`: cloning the open-source huml repository.
+  - `registry.npmjs.org`: `npm install` of the repo's dependencies.
+  - Cloudflare (`dash.cloudflare.com`, `api.cloudflare.com`) through `wrangler`: login, creating the user's database and KV namespace, deploying, and setting a secret, all in the user's own account.
+  - The user's own huml host: `npm run smoke` and `npm run tokens` against their deployment.
+
+No tokens or environment variables are sent anywhere except the user's own Cloudflare account and huml server.
 
 ## First-time setup
 
